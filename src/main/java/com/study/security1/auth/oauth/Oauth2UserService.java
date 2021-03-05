@@ -24,8 +24,6 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
 
     private final List<String> providers = Arrays.asList("Google", "Facebook", "Naver");
-    private final String path = "com.study.security1.auth.oauth.provider.";
-
 
     /*
     로그인 후처리함수. - google로부터 받은
@@ -62,20 +60,8 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
             .findFirst();
 
         final String provider = foundProvider.orElseThrow(IllegalAccessError::new);
-        System.out.println(provider);
 
-        OAuth2UserInfo oAuth2UserInfo = null;
-        //동적 객체 생성.
-        try {
-            //경로까지 지정해야함.
-            System.out.println(path + provider + "UserInfo");
-            oAuth2UserInfo =
-                (OAuth2UserInfo) Class.forName(path + provider + "UserInfo").newInstance();
-            oAuth2UserInfo.setRequest(userRequest);
-            oAuth2UserInfo.setUser(oAuth2User);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        OAuth2UserInfo oAuth2UserInfo = getoAuth2UserInfo(userRequest, oAuth2User, provider);
 
         String username = oAuth2UserInfo.getUsername();
         String email = oAuth2UserInfo.getEmail();
@@ -87,6 +73,23 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
 
         //여기 return값을 authentication 객체 안에 넣어준다.
         return new PrincipalDetails(user, oAuth2User.getAttributes());
+    }
+
+    private OAuth2UserInfo getoAuth2UserInfo(OAuth2UserRequest userRequest, OAuth2User oAuth2User,
+        String provider) {
+        //동적 객체 생성.
+        String path = "com.study.security1.auth.oauth.provider.";
+        try {
+            //경로까지 지정해야함.
+            OAuth2UserInfo oAuth2UserInfo =
+                (OAuth2UserInfo) Class.forName(path + provider + "UserInfo").newInstance();
+            oAuth2UserInfo.setRequest(userRequest);
+            oAuth2UserInfo.setUser(oAuth2User);
+            return oAuth2UserInfo;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //강제회원가입
