@@ -7,6 +7,7 @@ import com.study.security1.entity.User;
 import com.study.security1.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,7 +24,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
-    private final List<String> providers = Arrays.asList("Google", "Facebook", "Naver");
+    private final List<String> providers = Arrays.asList("Google", "Facebook", "Naver", "Kakao");
 
     /*
     로그인 후처리함수. - google로부터 받은
