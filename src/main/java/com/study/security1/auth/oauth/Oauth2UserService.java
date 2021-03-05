@@ -1,6 +1,7 @@
 package com.study.security1.auth.oauth;
 
 import com.study.security1.auth.PrincipalDetails;
+import com.study.security1.auth.oauth.provider.OAuth2UserInfo;
 import com.study.security1.dto.user.UserJoinDto;
 import com.study.security1.entity.User;
 import com.study.security1.repository.UserRepository;
@@ -15,7 +16,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.study.security1.auth.oauth.provider.*;
 
 @RequiredArgsConstructor
 @Service
@@ -23,7 +23,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
-    private final List<String> providers = Arrays.asList("Google", "Facebook");
+    private final List<String> providers = Arrays.asList("Google", "Facebook", "Naver");
     private final String path = "com.study.security1.auth.oauth.provider.";
 
 
@@ -70,8 +70,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
             //경로까지 지정해야함.
             System.out.println(path + provider + "UserInfo");
             oAuth2UserInfo =
-                (OAuth2UserInfo) Class.forName(path + provider + "UserInfo")
-                    .newInstance();
+                (OAuth2UserInfo) Class.forName(path + provider + "UserInfo").newInstance();
             oAuth2UserInfo.setRequest(userRequest);
             oAuth2UserInfo.setUser(oAuth2User);
         } catch (Exception e) {
@@ -93,7 +92,7 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
     //강제회원가입
     private User joinSocial(String username, String email, String provider, String providerId) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();    //무한참조 방지
-        String socialPassword = passwordEncoder.encode("google");
+        String socialPassword = passwordEncoder.encode(provider);
         UserJoinDto userJoinDto = new UserJoinDto(username, socialPassword, email);
         User user = new User(userJoinDto, provider, providerId);
         return userRepository.save(user);
